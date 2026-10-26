@@ -32,7 +32,8 @@ struct DashboardView: View {
     @AppStorage(Prefs.showBadges) private var showBadges = true
 
     var body: some View {
-        NavigationSplitView {
+        HStack(spacing: 0) {
+            VStack(spacing: 0) {
             ScrollView {
                 VStack(spacing: 2) {
                     ForEach(SidebarItem.allCases) { item in
@@ -63,9 +64,11 @@ struct DashboardView: View {
                 .padding(.horizontal, 8)
                 .padding(.top, 8)
             }
-            .navigationSplitViewColumnWidth(min: 190, ideal: 210)
-            .safeAreaInset(edge: .bottom) { sidebarFooter }
-        } detail: {
+            sidebarFooter
+            }
+            .frame(width: 220)
+            .background(.regularMaterial)
+            Divider()
             ZStack {
                 AmbientBackground()
                 ScrollView {
@@ -100,7 +103,7 @@ struct DashboardView: View {
                 }
             }
         }
-        .frame(minWidth: 820, minHeight: 560)
+        .frame(minWidth: 860, minHeight: 560)
     }
 
     private func badge(for item: SidebarItem) -> Text? {
