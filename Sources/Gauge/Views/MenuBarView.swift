@@ -112,6 +112,7 @@ struct MenuBarView: View {
                     .animation(store.isRefreshing ? .linear(duration: 1).repeatForever(autoreverses: false) : .default, value: store.isRefreshing)
                     .frame(width: 26, height: 26)
                     .background(Color.primary.opacity(0.07), in: Circle())
+                    .contentShape(Circle())
             }
             .buttonStyle(.plain)
             .help("Refresh now")
@@ -231,6 +232,7 @@ private struct FooterButton: View {
                 .padding(.horizontal, 8)
                 .padding(.vertical, 5)
                 .background(Color.primary.opacity(0.04), in: RoundedRectangle(cornerRadius: 6))
+                .contentShape(RoundedRectangle(cornerRadius: 6))
         }
         .buttonStyle(.plain)
     }
