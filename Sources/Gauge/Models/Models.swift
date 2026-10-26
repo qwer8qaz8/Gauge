@@ -107,6 +107,8 @@ struct ProviderState {
     var error: String?
     var isLoading = false
     var summary: String?
+    /// Non-error info shown as a subtle note (e.g. "using local estimate").
+    var note: String?
 
     /// The most constrained bucket (lowest remaining).
     var tightest: QuotaBucket? { buckets.min { $0.remaining < $1.remaining } }

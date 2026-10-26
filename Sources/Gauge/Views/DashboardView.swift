@@ -296,6 +296,12 @@ struct ProviderPage: View {
                 )
             }
 
+            if let note = state.note, state.error == nil {
+                Label(note, systemImage: "info.circle")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
             if let summary = state.summary {
                 Text(summary)
                     .font(.callout)

@@ -126,11 +126,13 @@ final class UsageStore: ObservableObject {
             if let local = CopilotService.localReport(from: cliStats, allowance: allow), local.used > report.used {
                 copilotReport = local
                 copilot.buckets = CopilotService.buckets(from: local)
-                copilot.error = "GitHub's billing report shows less usage than your local Copilot CLI logs, so Gauge is using the local count (other Copilot surfaces aren't included)."
+                copilot.error = nil
+                copilot.note = "Counted from local Copilot CLI sessions — other Copilot surfaces aren't included."
             } else {
                 copilotReport = report
                 copilot.buckets = CopilotService.buckets(from: report)
                 copilot.error = nil
+                copilot.note = nil
             }
             copilot.lastUpdated = .now
         } catch {
@@ -138,8 +140,8 @@ final class UsageStore: ObservableObject {
                 copilotReport = local
                 copilot.buckets = CopilotService.buckets(from: local)
                 copilot.lastUpdated = .now
-                let plan = "GitHub's billing API often isn't available for Student/free-via-education plans, so"
-                copilot.error = "\(plan) Gauge is counting Copilot CLI requests locally (other Copilot surfaces aren't included)."
+                copilot.error = nil
+                copilot.note = "Counted from local Copilot CLI sessions — other Copilot surfaces aren't included."
             } else {
                 copilot.error = error.localizedDescription
                 copilot.buckets = []
