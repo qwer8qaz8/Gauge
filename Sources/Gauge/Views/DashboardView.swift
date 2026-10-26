@@ -33,17 +33,35 @@ struct DashboardView: View {
 
     var body: some View {
         NavigationSplitView {
-            List(selection: Binding(
-                get: { store.sidebarSelection },
-                set: { if let val = $0 { store.sidebarSelection = val } }
-            )) {
-                Section {
+            ScrollView {
+                VStack(spacing: 2) {
                     ForEach(SidebarItem.allCases) { item in
-                        Label(item.title, systemImage: item.symbol)
-                            .tag(item)
-                            .badge(showBadges ? badge(for: item) : nil)
+                        let selected = store.sidebarSelection == item
+                        Button {
+                            store.sidebarSelection = item
+                        } label: {
+                            HStack(spacing: 10) {
+                                Image(systemName: item.symbol).frame(width: 20)
+                                Text(item.title)
+                                Spacer()
+                                if showBadges, let b = badge(for: item) {
+                                    b.font(.caption).foregroundStyle(.secondary).monospacedDigit()
+                                }
+                            }
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 7)
+                            .contentShape(Rectangle())
+                            .background(
+                                RoundedRectangle(cornerRadius: 7)
+                                    .fill(selected ? Color.accentColor.opacity(0.22) : Color.clear)
+                            )
+                            .foregroundStyle(selected ? Color.accentColor : Color.primary)
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
+                .padding(.horizontal, 8)
+                .padding(.top, 8)
             }
             .navigationSplitViewColumnWidth(min: 190, ideal: 210)
             .safeAreaInset(edge: .bottom) { sidebarFooter }

@@ -129,7 +129,8 @@ final class UsageStore: ObservableObject {
                 copilotReport = local
                 copilot.buckets = CopilotService.buckets(from: local)
                 copilot.lastUpdated = .now
-                copilot.error = "Showing local Copilot CLI estimate. " + error.localizedDescription
+                let plan = "GitHub's billing API often isn't available for Student/free-via-education plans, so"
+                copilot.error = "\(plan) Gauge is counting Copilot CLI requests locally (other Copilot surfaces aren't included)."
             } else {
                 copilot.error = error.localizedDescription
                 copilot.buckets = []

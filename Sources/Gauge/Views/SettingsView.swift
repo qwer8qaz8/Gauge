@@ -204,7 +204,7 @@ private struct AccountsSettings: View {
 
                     Picker("Monthly allowance", selection: $allowance) {
                         Text("Copilot Free · 50").tag(50.0)
-                        Text("Copilot Pro / Business · 300").tag(300.0)
+                        Text("Student / Pro / Business · 300").tag(300.0)
                         Text("Copilot Enterprise · 1000").tag(1000.0)
                         Text("Copilot Pro+ · 1500").tag(1500.0)
                     }
@@ -248,7 +248,7 @@ private struct CLISettings: View {
             Section("GitHub billing") {
                 Toggle("Use token from `gh` CLI when no token is saved", isOn: $useGh)
                     .onChange(of: useGh) { _, _ in Task { await store.refreshCopilot() } }
-                Text("Needs the `user` scope: run `gh auth refresh -h github.com -s user`. Without billing access Gauge falls back to local CLI usage.")
+                Text("Needs the `user` scope: run `gh auth refresh -h github.com -s user`. Student plans usually have no billing access — Gauge then counts Copilot CLI usage locally against your allowance (300 for Student/Pro).")
                     .font(.caption).foregroundStyle(.secondary)
             }
         }
