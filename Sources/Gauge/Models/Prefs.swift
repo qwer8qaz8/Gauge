@@ -32,7 +32,7 @@ enum Prefs {
             menuBarStyle: MenuBarStyle.iconAndPercent.rawValue,
             pinnedBucket: "auto",
             agyPath: "",
-            copilotAllowance: 300.0,
+            copilotAllowance: 200.0,
             copilotEnabled: true,
             antigravityEnabled: true,
             notificationsEnabled: true,

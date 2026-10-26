@@ -2,7 +2,7 @@ import Charts
 import SwiftUI
 
 enum SidebarItem: String, Hashable, CaseIterable, Identifiable {
-    case overview, antigravity, copilot, cli, history
+    case antigravity, overview, copilot, cli, history
 
     var id: String { rawValue }
 
@@ -142,10 +142,11 @@ struct OverviewPage: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
-            HStack(spacing: 16) {
-                ForEach(Provider.allCases) { provider in
-                    HeroCard(provider: provider)
-                }
+            VStack(spacing: 16) {
+                HeroCard(provider: .antigravity)
+                HeroCard(provider: .copilot)
+                    .scaleEffect(0.98)
+                    .opacity(0.92)
             }
 
             ForEach(Provider.allCases) { provider in

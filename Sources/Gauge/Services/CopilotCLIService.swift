@@ -63,31 +63,24 @@ enum CopilotCLIService {
                     index += 1
                 }
             }
-            if shutdowns.isEmpty {
-                // Session still running (or crashed): build it from per-call records.
-                if let last = lastCall {
-                    let list = Array(calls.values)
-                    sessions.append(CLISession(
-                        id: entry.lastPathComponent, date: last, project: meta.project, client: meta.client,
-                        premium: list.reduce(0) { $0 + $1.premium }, requests: list.reduce(0) { $0 + Int($1.requests) },
-                        input: list.reduce(0) { $0 + $1.input }, output: list.reduce(0) { $0 + $1.output },
-                        cacheRead: list.reduce(0) { $0 + $1.cacheRead }, cacheWrite: 0,
-                        reasoning: list.reduce(0) { $0 + $1.reasoning },
-                        apiSeconds: list.reduce(0) { $0 + $1.apiSeconds }, credits: 0,
-                        linesAdded: 0, linesRemoved: 0, filesChanged: 0,
-                        models: list.sorted { $0.apiSeconds > $1.apiSeconds }
-                    ))
-                }
+            // Per-call usage records are the source of truth: a shutdown summary only covers the last
+            // run of a resumed session, so it undercounts. Shutdowns just add code-change counters.
+            if let last = lastCall {
+                let list = Array(calls.values)
+                sessions.append(CLISession(
+                    id: entry.lastPathComponent, date: last, project: meta.project, client: meta.client,
+                    premium: list.reduce(0) { $0 + $1.premium }, requests: list.reduce(0) { $0 + Int($1.requests) },
+                    input: list.reduce(0) { $0 + $1.input }, output: list.reduce(0) { $0 + $1.output },
+                    cacheRead: list.reduce(0) { $0 + $1.cacheRead }, cacheWrite: shutdowns.reduce(0) { $0 + $1.cacheWrite },
+                    reasoning: list.reduce(0) { $0 + $1.reasoning },
+                    apiSeconds: list.reduce(0) { $0 + $1.apiSeconds }, credits: shutdowns.reduce(0) { $0 + $1.credits },
+                    linesAdded: shutdowns.reduce(0) { $0 + $1.linesAdded },
+                    linesRemoved: shutdowns.reduce(0) { $0 + $1.linesRemoved },
+                    filesChanged: shutdowns.reduce(0) { $0 + $1.filesChanged },
+                    models: list.sorted { $0.apiSeconds > $1.apiSeconds }
+                ))
             } else {
-                // Attach per-model latency from the call records to the (usually single) shutdown summary.
-                for var s in shutdowns {
-                    s.models = s.models.map { m in
-                        var m = m
-                        if let c = calls[m.name] { m.apiSeconds = c.apiSeconds; m.ttftSumMs = c.ttftSumMs; m.calls = c.calls }
-                        return m
-                    }
-                    sessions.append(s)
-                }
+                sessions.append(contentsOf: shutdowns)
             }
         }
         sessions.sort { $0.date > $1.date }

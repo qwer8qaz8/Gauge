@@ -121,7 +121,7 @@ private struct AccountsSettings: View {
     @AppStorage(Prefs.antigravityEnabled) private var agEnabled = true
     @AppStorage(Prefs.copilotEnabled) private var cpEnabled = true
     @AppStorage(Prefs.agyPath) private var agyPath = ""
-    @AppStorage(Prefs.copilotAllowance) private var allowance = 300.0
+    @AppStorage(Prefs.copilotAllowance) private var allowance = 200.0
 
     var body: some View {
         Form {
@@ -204,7 +204,8 @@ private struct AccountsSettings: View {
 
                     Picker("Monthly allowance", selection: $allowance) {
                         Text("Copilot Free · 50").tag(50.0)
-                        Text("Student / Pro / Business · 300").tag(300.0)
+                        Text("Student · 200").tag(200.0)
+                        Text("Copilot Pro / Business · 300").tag(300.0)
                         Text("Copilot Enterprise · 1000").tag(1000.0)
                         Text("Copilot Pro+ · 1500").tag(1500.0)
                     }
@@ -248,7 +249,7 @@ private struct CLISettings: View {
             Section("GitHub billing") {
                 Toggle("Use token from `gh` CLI when no token is saved", isOn: $useGh)
                     .onChange(of: useGh) { _, _ in Task { await store.refreshCopilot() } }
-                Text("Needs the `user` scope: run `gh auth refresh -h github.com -s user`. Student plans usually have no billing access — Gauge then counts Copilot CLI usage locally against your allowance (300 for Student/Pro).")
+                Text("Needs the `user` scope: run `gh auth refresh -h github.com -s user`. Student plans usually have no billing access — Gauge then counts Copilot CLI usage locally against your allowance (200 for Student, 300 for Pro).")
                     .font(.caption).foregroundStyle(.secondary)
             }
         }

@@ -17,7 +17,7 @@ final class UsageStore: ObservableObject {
     @Published var tokenRevision = 0
 
     // UI Navigation & settings states kept in store
-    @Published var sidebarSelection: SidebarItem = .overview
+    @Published var sidebarSelection: SidebarItem = .antigravity
     @Published var historyRange: Int = 1
     @Published var copilotInputToken: String = ""
     @Published var isEditingToken: Bool = false
@@ -61,7 +61,9 @@ final class UsageStore: ObservableObject {
     var featuredBucket: QuotaBucket? {
         let pinned = UserDefaults.standard.string(forKey: Prefs.pinnedBucket) ?? "auto"
         if pinned != "auto", let b = allBuckets.first(where: { $0.id == pinned }) { return b }
-        return allBuckets.min { $0.remaining < $1.remaining }
+        // Antigravity is the primary service; fall back to Copilot only if it has no data.
+        return antigravity.buckets.min { $0.remaining < $1.remaining }
+            ?? allBuckets.min { $0.remaining < $1.remaining }
     }
 
     func start() {
@@ -117,12 +119,19 @@ final class UsageStore: ObservableObject {
         defer { copilot.isLoading = false }
         await refreshCLIStats()
         let allowance = UserDefaults.standard.double(forKey: Prefs.copilotAllowance)
-        let allow = allowance > 0 ? allowance : 300
+        let allow = allowance > 0 ? allowance : 200
         do {
             let report = try await CopilotService.fetch(allowance: allow)
-            copilotReport = report
-            copilot.buckets = CopilotService.buckets(from: report)
-            copilot.error = nil
+            // Student/free plans often return an empty billing report; never show less than what the CLI logged locally.
+            if let local = CopilotService.localReport(from: cliStats, allowance: allow), local.used > report.used {
+                copilotReport = local
+                copilot.buckets = CopilotService.buckets(from: local)
+                copilot.error = "GitHub's billing report shows less usage than your local Copilot CLI logs, so Gauge is using the local count (other Copilot surfaces aren't included)."
+            } else {
+                copilotReport = report
+                copilot.buckets = CopilotService.buckets(from: report)
+                copilot.error = nil
+            }
             copilot.lastUpdated = .now
         } catch {
             if let local = CopilotService.localReport(from: cliStats, allowance: allow) {
